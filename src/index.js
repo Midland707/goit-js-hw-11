@@ -95,7 +95,37 @@
 // all modules
 import Notiflix from 'notiflix';
 
+import axios from 'axios';
+//const axios = require('axios'); // legacy way
+
 // Описаний в документації
 import SimpleLightbox from 'simplelightbox';
 // Додатковий імпорт стилів
 import 'simplelightbox/dist/simple-lightbox.min.css';
+
+const BASE_URL = 'https://pixabay.com/api/';
+
+const searchInput = document.querySelector('.search-form input');
+const searchButton = document.querySelector('.search-form');
+let search = '';
+
+searchInput.addEventListener('input', onInput);
+function onInput() {
+  search = searchInput.value;
+}
+
+const key = '32874218-f955783fbc8df841e2f172dbc';
+// https://pixabay.com/api/?key=32874218-f955783fbc8df841e2f172dbc&q=SEARCH&image_type=photo&orientation=horizontal&safesearch=true
+searchButton.addEventListener('submit', createGallery);
+async function createGallery(event) {
+  try {
+    event.preventDefault();
+    const response = await axios.get(
+      `https://pixabay.com/api/?key=32874218-f955783fbc8df841e2f172dbc&q=${search}&image_type=photo&orientation=horizontal&safesearch=true`
+    );
+    // console.log(JSON.stringify(response));
+    console.log(response);
+  } catch (error) {
+    console.error(error);
+  }
+}
