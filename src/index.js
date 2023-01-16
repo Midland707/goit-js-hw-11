@@ -103,10 +103,10 @@ import SimpleLightbox from 'simplelightbox';
 // Додатковий імпорт стилів
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const BASE_URL = 'https://pixabay.com/api/';
-
 const searchInput = document.querySelector('.search-form input');
 const searchButton = document.querySelector('.search-form');
+const galleryList = document.querySelector('.gallery');
+
 let search = '';
 
 searchInput.addEventListener('input', onInput);
@@ -114,14 +114,18 @@ function onInput() {
   search = searchInput.value;
 }
 
+const BASE_URL = 'https://pixabay.com/api/';
 const key = '32874218-f955783fbc8df841e2f172dbc';
+const imgOnPage = 40;
+let pageNumber = 1;
 // https://pixabay.com/api/?key=32874218-f955783fbc8df841e2f172dbc&q=SEARCH&image_type=photo&orientation=horizontal&safesearch=true
 searchButton.addEventListener('submit', createGallery);
 async function createGallery(event) {
   try {
     event.preventDefault();
+   document.querySelectorAll('.gallery__item').forEach(e => e.remove());
     const response = await axios.get(
-      `https://pixabay.com/api/?key=32874218-f955783fbc8df841e2f172dbc&q=${search}&image_type=photo&orientation=horizontal&safesearch=true`
+      `${BASE_URL}?key=${key}&q=${search}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${imgOnPage}&page=${pageNumber}`
     );
     if (response.data.totalHits === 0 || search === '')
       return Notiflix.Notify.failure(
@@ -131,18 +135,41 @@ async function createGallery(event) {
       `Hooray! We found ${response.data.totalHits} images.`
     );
 
-    // let gallery = new SimpleLightbox('.gallery a');
-    // gallery.on('show.simplelightbox', function () {
-    //   // do something…
-    // });
-    console.log('data.hits');
-    console.log(response.data.hits);
+    const items = response.data.hits.reduce(
+  (acc, { largeImageURL, webformatURL, tags, likes, views, comments, downloads}) =>
+    acc +
+    `<a class="gallery__item" href="${largeImageURL}">
+    <div class="photo-card">
+      <img class="gallery__image" src="${webformatURL}" alt="${tags}" loading="lazy" />
+      <div class="info">
+      <p class="info-item">
+        <b>Likes</b>
+        ${likes}
+      </p>
+      <p class="info-item">
+        <b>Views</b>
+      ${views}
+    </p>
+    <p class="info-item">
+      <b>Comments</b>
+      ${comments}
+    </p>
+    <p class="info-item">
+      <b>Downloads</b>
+      ${downloads}
+    </p>
+  </div>
+</div>
+</a>
+`,
+  ''
+      );
+ galleryList.insertAdjacentHTML('beforeend', items);
+new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
   } catch (error) {
-    console.log('status');
-    console.log(error.status);
-    console.log('statusText');
-    console.log(error.statusText);
-    console.log('error');
     console.error(error);
   }
 }
