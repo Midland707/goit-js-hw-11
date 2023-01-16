@@ -123,9 +123,26 @@ async function createGallery(event) {
     const response = await axios.get(
       `https://pixabay.com/api/?key=32874218-f955783fbc8df841e2f172dbc&q=${search}&image_type=photo&orientation=horizontal&safesearch=true`
     );
-    // console.log(JSON.stringify(response));
-    console.log(response);
+    if (response.data.totalHits === 0 || search === '')
+      return Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    Notiflix.Notify.success(
+      `Hooray! We found ${response.data.totalHits} images.`
+    );
+
+    // let gallery = new SimpleLightbox('.gallery a');
+    // gallery.on('show.simplelightbox', function () {
+    //   // do something…
+    // });
+    console.log('data.hits');
+    console.log(response.data.hits);
   } catch (error) {
+    console.log('status');
+    console.log(error.status);
+    console.log('statusText');
+    console.log(error.statusText);
+    console.log('error');
     console.error(error);
   }
 }
