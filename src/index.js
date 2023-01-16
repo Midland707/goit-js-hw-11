@@ -106,9 +106,10 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const searchInput = document.querySelector('.search-form input');
 const searchButton = document.querySelector('.search-form');
 const galleryList = document.querySelector('.gallery');
+const loadMore = document.querySelector('.load-more');
+loadMore.hidden = true;
 
 let search = '';
-
 searchInput.addEventListener('input', onInput);
 function onInput() {
   search = searchInput.value;
@@ -119,26 +120,50 @@ const key = '32874218-f955783fbc8df841e2f172dbc';
 const imgOnPage = 40;
 let pageNumber = 1;
 // https://pixabay.com/api/?key=32874218-f955783fbc8df841e2f172dbc&q=SEARCH&image_type=photo&orientation=horizontal&safesearch=true
-searchButton.addEventListener('submit', createGallery);
-async function createGallery(event) {
-  try {
-    event.preventDefault();
-   document.querySelectorAll('.gallery__item').forEach(e => e.remove());
+searchButton.addEventListener('submit', onSubmit);
+async function onSubmit(event) {
+  event.preventDefault();
+  loadMore.hidden = true;
+  document.querySelectorAll('.gallery__item').forEach(e => e.remove());
+        if (search === '') 
+      return Notiflix.Notify.failure(
+        '1 Sorry, there are no images matching your search query. Please try again.'
+    );
+  apiRequest(pageNumber);
+}
+
+async function apiRequest(pageNumber) {
+    try {
     const response = await axios.get(
       `${BASE_URL}?key=${key}&q=${search}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${imgOnPage}&page=${pageNumber}`
     );
-    if (response.data.totalHits === 0 || search === '')
-      return Notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
+      if (response.data.totalHits === 0) {
+        loadMore.hidden = true;
+        return Notiflix.Notify.failure(
+          '2 Sorry, there are no images matching your search query. Please try again.'
+        );
+      }
+        if (response.data.totalHits < document.querySelectorAll('.gallery__item').length) {
+          loadMore.hidden = true;
+          return Notiflix.Notify.failure(
+            "We're sorry, but you've reached the end of search results."
+          );
+      }
     Notiflix.Notify.success(
       `Hooray! We found ${response.data.totalHits} images.`
     );
+      createGallery(response.data.hits);
+        loadMore.hidden = false;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-    const items = response.data.hits.reduce(
-  (acc, { largeImageURL, webformatURL, tags, likes, views, comments, downloads}) =>
-    acc +
-    `<a class="gallery__item" href="${largeImageURL}">
+function createGallery(data) {
+  const items = data.reduce(
+    (acc, { largeImageURL, webformatURL, tags, likes, views, comments, downloads }) =>
+      acc +
+      `<a class="gallery__item" href="${largeImageURL}">
     <div class="photo-card">
       <img class="gallery__image" src="${webformatURL}" alt="${tags}" loading="lazy" />
       <div class="info">
@@ -162,14 +187,20 @@ async function createGallery(event) {
 </div>
 </a>
 `,
-  ''
-      );
- galleryList.insertAdjacentHTML('beforeend', items);
-new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
-  captionDelay: 250,
-});
-  } catch (error) {
-    console.error(error);
-  }
+    ''
+  );
+  galleryList.insertAdjacentHTML('beforeend', items);
+  new SimpleLightbox('.gallery a', {
+    captionsData: 'alt',
+    captionDelay: 250,
+  });
+}
+
+loadMore.addEventListener('click', onClick);
+function onClick() {
+  console.log();
+  pageNumber += 1;
+  apiRequest(pageNumber)
+  // Бібліотека SimpleLightbox містить метод refresh(), який обов'язково потрібно викликати щоразу 
+  // після додавання нової групи карток зображень.
 }
