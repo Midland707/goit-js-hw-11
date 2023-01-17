@@ -12,9 +12,37 @@ body {
   line-height: 1.5;
 }
 
-#search-box {
+.container {
+  position: fixed;
+  display: inline-block;
+}
+
+.search-form {
   font: inherit;
   padding: 8px;
   max-width: 320px;
   margin-bottom: 16px;
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+    gap: 30px;
+}
+
+.gallery__item{}
+
+.photo-card {}
+
+.gallery__image {}
+
+.info {
+  display: flex;
+  gap: 30px;
+}
+
+.info-item {
+    display: flex;
+      gap: 30px;
+      flex-direction: column;
 }
