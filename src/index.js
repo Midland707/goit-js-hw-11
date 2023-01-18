@@ -108,6 +108,7 @@ const searchButton = document.querySelector('.search-form');
 const galleryList = document.querySelector('.gallery');
 const loadMore = document.querySelector('.load-more');
 loadMore.hidden = true;
+let gallery;
 
 let search = '';
 searchInput.addEventListener('input', onInput);
@@ -124,10 +125,11 @@ searchButton.addEventListener('submit', onSubmit);
 async function onSubmit(event) {
   event.preventDefault();
   loadMore.hidden = true;
-  document.querySelectorAll('.gallery__item').forEach(e => e.remove());
+  pageNumber = 1;
+  document.querySelectorAll('.gallery__item').forEach(e => e.remove()); //delete all images
         if (search === '') 
       return Notiflix.Notify.failure(
-        '1 Sorry, there are no images matching your search query. Please try again.'
+        'Sorry, there are no images matching your search query. Please try again.'
     );
   apiRequest(pageNumber);
 }
@@ -140,20 +142,22 @@ async function apiRequest(pageNumber) {
       if (response.data.totalHits === 0) {
         loadMore.hidden = true;
         return Notiflix.Notify.failure(
-          '2 Sorry, there are no images matching your search query. Please try again.'
+          'Sorry, there are no images matching your search query. Please try again.'
         );
       }
-        if (response.data.totalHits < document.querySelectorAll('.gallery__item').length) {
+      if (pageNumber === 1) {
+        Notiflix.Notify.success(
+          `Hooray! We found ${response.data.totalHits} images.`
+        );
+      }
+      createGallery(response.data.hits);
+      if (response.data.totalHits <= document.querySelectorAll('.gallery__item').length) {
           loadMore.hidden = true;
           return Notiflix.Notify.failure(
             "We're sorry, but you've reached the end of search results."
           );
-      }
-    Notiflix.Notify.success(
-      `Hooray! We found ${response.data.totalHits} images.`
-    );
-      createGallery(response.data.hits);
-        loadMore.hidden = false;
+      } else loadMore.hidden = false;
+        
   } catch (error) {
     console.error(error);
   }
@@ -189,18 +193,37 @@ function createGallery(data) {
 `,
     ''
   );
-  galleryList.insertAdjacentHTML('beforeend', items);
-  new SimpleLightbox('.gallery a', {
-    captionsData: 'alt',
-    captionDelay: 250,
-  });
+    galleryList.insertAdjacentHTML('beforeend', items);
+    gallery = new SimpleLightbox('.gallery a', {
+      captionsData: 'alt',
+      captionDelay: 250,
+    });
 }
 
 loadMore.addEventListener('click', onClick);
 function onClick() {
-  console.log();
   pageNumber += 1;
   apiRequest(pageNumber)
-  // Бібліотека SimpleLightbox містить метод refresh(), який обов'язково потрібно викликати щоразу 
-  // після додавання нової групи карток зображень.
+  gallery.refresh();
+  pageScrolling();
+}
+
+function pageScrolling() {
+  const { height: cardHeight, top, width} = document
+    .querySelector(".gallery")
+    .firstElementChild.getBoundingClientRect();
+  
+   console.log(document
+    .querySelector(".gallery")
+    .firstElementChild.getBoundingClientRect());
+   
+  window.scrollBy({
+    top: cardHeight - width,
+    // top: cardHeight * 2,
+  behavior: "smooth",
+  });
+  
+  console.log(document
+    .querySelector(".gallery")
+    .firstElementChild.getBoundingClientRect());
 }
