@@ -14,27 +14,53 @@ body {
 
 .container {
   position: fixed;
-  display: inline-block;
+  background-color: blue;
+  height: 60px;
+  text-align: center;
+  z-index: 99;
+  width: 100%;
 }
 
 .search-form {
-  font: inherit;
-  padding: 8px;
-  max-width: 320px;
-  margin-bottom: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 500px;
+  padding: 10px;
+}
+
+.search-form-input {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.15));
+  border-radius: 4px;
+  border: 0;
+  width: 358px;
+  height: 40px;
+  padding-left: 16px;
+}
+
+.search-form-button {
+  box-shadow: 0px 4px 4px rgb(0 0 0 / 15%);
+  border-radius: 4px;
+  border: 0;
+  height: 40px;
+  cursor: pointer;
 }
 
 .gallery {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
-    gap: 30px;
+  gap: 20px;
 }
 
-.gallery__item{}
+.gallery__item {
+}
 
-.photo-card {}
+.photo-card {
+}
 
-.gallery__image {}
+.gallery__image {
+}
 
 .info {
   display: flex;
@@ -42,7 +68,7 @@ body {
 }
 
 .info-item {
-    display: flex;
-      gap: 30px;
-      flex-direction: column;
+  display: flex;
+  gap: 30px;
+  flex-direction: column;
 }
