@@ -60,15 +60,17 @@ body {
 }
 
 .gallery__image {
+  width: 300px;
+  height: 200px;
 }
 
 .info {
   display: flex;
-  gap: 30px;
+  gap: 20px;
 }
 
 .info-item {
   display: flex;
-  gap: 30px;
+  gap: 20px;
   flex-direction: column;
 }
