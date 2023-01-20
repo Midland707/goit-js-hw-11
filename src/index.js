@@ -108,8 +108,11 @@ const searchButton = document.querySelector('.search-form');
 const galleryList = document.querySelector('.gallery');
 const loadMore = document.querySelector('.load-more');
 const footer = document.querySelector('.footer');
+const footerMessage = document.querySelector('.footer-message');
+
 footer.hidden = true;
 loadMore.hidden = true;
+footerMessage.hidden = true;
 let gallery;
 
 let search = '';
@@ -126,8 +129,8 @@ let pageNumber = 1;
 searchButton.addEventListener('submit', onSubmit);
 async function onSubmit(event) {
   event.preventDefault();
-  loadMore.hidden = true;
   footer.hidden = true;
+  footerMessage.hidden = true;
   pageNumber = 1;
   document.querySelectorAll('.gallery__item').forEach(e => e.remove()); //delete all images
   if (search === '')
@@ -143,7 +146,6 @@ async function apiRequest(pageNumber) {
       `${BASE_URL}?key=${key}&q=${search}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${imgOnPage}&page=${pageNumber}`
     );
     if (response.data.totalHits === 0) {
-      loadMore.hidden = true;
       footer.hidden = true;
       return Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -161,6 +163,7 @@ async function apiRequest(pageNumber) {
     ) {
       loadMore.hidden = true;
       footer.hidden = false;
+      footerMessage.hidden = false;
       // return Notiflix.Notify.failure(
       //   "We're sorry, but you've reached the end of search results."
       // );
