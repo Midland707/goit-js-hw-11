@@ -107,6 +107,8 @@ const searchInput = document.querySelector('.search-form input');
 const searchButton = document.querySelector('.search-form');
 const galleryList = document.querySelector('.gallery');
 const loadMore = document.querySelector('.load-more');
+const footer = document.querySelector('.footer');
+footer.hidden = true;
 loadMore.hidden = true;
 let gallery;
 
@@ -125,6 +127,7 @@ searchButton.addEventListener('submit', onSubmit);
 async function onSubmit(event) {
   event.preventDefault();
   loadMore.hidden = true;
+  footer.hidden = true;
   pageNumber = 1;
   document.querySelectorAll('.gallery__item').forEach(e => e.remove()); //delete all images
   if (search === '')
@@ -141,6 +144,7 @@ async function apiRequest(pageNumber) {
     );
     if (response.data.totalHits === 0) {
       loadMore.hidden = true;
+      footer.hidden = true;
       return Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
@@ -156,10 +160,14 @@ async function apiRequest(pageNumber) {
       document.querySelectorAll('.gallery__item').length
     ) {
       loadMore.hidden = true;
-      return Notiflix.Notify.failure(
-        "We're sorry, but you've reached the end of search results."
-      );
-    } else loadMore.hidden = false;
+      footer.hidden = false;
+      // return Notiflix.Notify.failure(
+      //   "We're sorry, but you've reached the end of search results."
+      // );
+    } else {
+      loadMore.hidden = false;
+      footer.hidden = false;
+    }
 
     if (pageNumber > 1) {
       const { height: cardHeight } = document
